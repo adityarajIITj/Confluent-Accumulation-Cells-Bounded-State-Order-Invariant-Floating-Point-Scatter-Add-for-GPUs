@@ -92,9 +92,10 @@ documentation lists CUDA operations, among them index\_add\_, histc,
 weighted bincount and the backward passes of grid\_sample and several
 interpolation modes, that either switch to a slower deterministic
 implementation or raise an error under
-torch.use\_deterministic\_algorithms(True) {[}4{]}. Cankaya shows that
-LLM inference can be re-computed bit for bit across GPU types, on the
-condition that no atomic functions are called in the backend {[}5{]}.
+torch.use\_deterministic\_algorithms(True) {[}4{]}. Cankaya finds GPU
+inference bit-reproducible on identical hardware and reproduces it
+across GPU types with an emulator; floating-point atomics were the only
+true source of run-to-run variation in those experiments {[}5{]}.
 
 Bit-level reproducibility matters for regression testing, for debugging,
 for auditing a computation by re-running it, and for getting the same
@@ -283,9 +284,10 @@ still changes when the input order or the device count changes.
 \textbf{Atomic addition specifically.} Defour and Collange study exactly
 this operation {[}9{]}. They propose work reassignment, which enforces
 an order, and fixed-point accumulation in a long accumulator updated
-with integer atomics, which is exact. They report overheads from 1.3× to
-21×. Their accumulator is complete: it covers the whole exponent range,
-which is what makes it large.
+with integer atomics, which is exact. For the long accumulator they
+report overheads of 1.3× to 21× over unordered atomic addition, and 0.4×
+to 10× for work reassignment. Their accumulator is complete: it covers
+the whole exponent range, which is what makes it large.
 
 \textbf{Exact and reproducible summation.} Long accumulators go back to
 Kulisch {[}15{]} and were made fast on multi-core and GPU reductions by
@@ -299,11 +301,12 @@ together. To our knowledge none of them is formulated as a shared cell
 that many lanes update lock-free.
 
 \textbf{Practice.} GPU molecular dynamics accumulates forces in 64-bit
-fixed point with a scale chosen in advance {[}8{]}. A GPU
-quantum-chemistry code adopted fixed-point integer atomics for the same
-reason {[}18{]}, and an inference runtime documents that its binary32
-scatter-sum is not bit-reproducible {[}19{]}. Each is a local workaround
-for the general problem.
+fixed point with a scale chosen in advance {[}8{]}. Users of a GPU
+quantum-chemistry code have proposed fixed-point integer atomics to make
+energies and gradients repeat bit for bit, and its maintainers have
+raised the overflow risk of the fixed scale {[}18{]}, and an inference
+runtime documents that its binary32 scatter-sum is not bit-reproducible
+{[}19{]}. Each is a local workaround for the general problem.
 
 \textbf{Replicated data types.} A state-based CRDT converges because its
 merge is associative, commutative and idempotent {[}16{]}. CAC uses the
@@ -1485,8 +1488,8 @@ inference verification without performance tradeoffs}. arXiv:2606.00279,
 GPUDet: a deterministic GPU architecture. ASPLOS 2013.
 
 \bibitem{ref7} Y. H. Chou, C. Ng, S. Cattell, J. Intan, M. D. Sinclair, J. Devietti, T.
-G. Rogers, T. M. Aamodt. Deterministic atomic buffering. MICRO 2020. DOI
-10.1109/MICRO50266.2020.00083.
+G. Rogers, T. M. Aamodt. Deterministic atomic buffering. MICRO 2020,
+pp.~981--995. DOI 10.1109/MICRO50266.2020.00083.
 
 \bibitem{ref8} S. Le Grand, A. W. Götz, R. C. Walker. SPFP: speed without compromise
 --- a mixed precision model for GPU accelerated molecular dynamics
@@ -1524,11 +1527,13 @@ replicated data types. SSS 2011.
 
 \bibitem{ref17} IEEE Standard for Floating-Point Arithmetic, IEEE Std 754-2019.
 
-\bibitem{ref18} pyscf/gpu4pyscf, GitHub issue \#1007: fixed-point integer atomics for
-reproducible accumulation.
+\bibitem{ref18} pyscf/gpu4pyscf, GitHub issue \#1007: Run-to-run non-determinism from
+floating-point atomics. Opened 31 October 2026.
+https://github.com/pyscf/gpu4pyscf/issues/1007
 
-\bibitem{ref19} openvinotoolkit/openvino, GitHub pull request \#37458: binary32
-scatter-sum is not bit-reproducible.
+\bibitem{ref19} openvinotoolkit/openvino, GitHub pull request \#37458: {[}GPU{]} Add a
+local-memory-staged fast path for dense SUM ScatterElementsUpdate.
+https://github.com/openvinotoolkit/openvino/pull/37458
 \end{thebibliography}
 
 \appendix
