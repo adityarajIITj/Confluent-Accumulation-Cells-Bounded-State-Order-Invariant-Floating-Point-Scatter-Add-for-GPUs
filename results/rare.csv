@@ -1,0 +1,6 @@
+range_bits,addends,trials,double_acc_order_dependent,forward_not_exact,backward_not_exact,float_trials,float_acc_order_dependent
+0,16,67108864,0,0,0,1048576,748374
+24,16,67108864,0,0,0,1048576,673593
+32,16,67108864,0,0,0,1048576,647197
+48,16,268435456,0,0,0,1048576,573592
+80,16,268435456,3,1,2,1048576,449709
