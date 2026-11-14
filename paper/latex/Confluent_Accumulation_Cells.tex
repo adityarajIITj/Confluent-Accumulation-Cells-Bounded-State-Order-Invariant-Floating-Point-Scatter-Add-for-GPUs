@@ -662,7 +662,8 @@ read-out & 8 B \\
 SORT-IDX & Group by destination, add in source-index order; no atomics & none; 8 B scratch per contribution \\
 SORT-VAL & Group by destination, sort the values canonically, add & none; 8 B scratch per contribution \\
 FIXED-Qf & Convert to 64-bit fixed point with f fractional bits (32 or 48), integer
-atomic add, saturating & 8 B \\
+atomic add; each input saturates at \(2^{62}\) and the sum wraps modulo
+\(2^{64}\) & 8 B \\
 WINDOW-2P & Pass 1: atomic max of the leading-bit position. Pass 2: round each
 addend to a grid 40 bits below it and add as integers. binary32 only & 16 B \\
 SUPERACC & Exact carry-save long accumulator: one 64-bit word per 32-bit bin,
@@ -1150,7 +1151,7 @@ DOUBLE-ACC, FIXED-Q32, WINDOW-2P, SUPERACC, CAC-2x32 & 0 & 0 & 0 \\
 
 The entries are the share of parameters whose bits differ from replica 0
 after 400 steps. With FLOAT under different schedules the share was
-9.2\% after 10 steps and 63.0\% after 100. The divergence is small in
+10.1\% after 10 steps and 63.4\% after 100. The divergence is small in
 value: the largest parameter difference was \(4.8\times10^{-7}\) and the
 losses differed by less than \(9\times10^{-9}\) at every step, while the
 loss fell from 0.502 to 0.074. This experiment shows a reproducibility
@@ -1266,7 +1267,7 @@ establish}\label{what-the-results-establish}}
   \textbf{RQ2.} A bounded-state, single-pass, order-invariant mechanism
   exists. Its invariance is proven and was never violated: 420 gates,
   1,152 sensitivity configurations, 80 contention configurations and 72
-  real-thread runs.
+  real-thread runs of CAC.
 \item
   \textbf{RQ3.} Outside the overflow case, CAC with enough cells missed
   at most five of 53,248 destinations, and the error bound held
