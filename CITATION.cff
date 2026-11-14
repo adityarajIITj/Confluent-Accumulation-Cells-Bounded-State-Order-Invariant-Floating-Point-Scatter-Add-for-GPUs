@@ -1,0 +1,30 @@
+cff-version: 1.2.0
+message: "If you use this software or the paper's results, please cite it as below."
+title: "Confluent Accumulation Cells: Bounded-State, Order-Invariant Floating-Point Scatter-Add for GPUs"
+type: software
+authors:
+  - family-names: Raj
+    given-names: Aditya
+    affiliation: "School of Artificial Intelligence and Data Science, Indian Institute of Technology Jodhpur"
+repository-code: "https://github.com/adityarajIITj/Confluent-Accumulation-Cells-Bounded-State-Order-Invariant-Floating-Point-Scatter-Add-for-GPUs"
+license: MIT
+date-released: "2026-11-14"
+keywords:
+  - floating-point reproducibility
+  - GPU atomic operations
+  - scatter-add
+  - deterministic parallel reduction
+  - commutative monoid
+abstract: >-
+  Confluent Accumulation Cells (CAC) make floating-point scatter-add independent of
+  execution order with two to four 64-bit cells per destination, in one pass and with
+  no prior knowledge of the value range. This repository contains the C++17 reference
+  model, the experiments, the results and the paper.
+preferred-citation:
+  type: article
+  title: "Confluent Accumulation Cells: Bounded-State, Order-Invariant Floating-Point Scatter-Add for GPUs"
+  authors:
+    - family-names: Raj
+      given-names: Aditya
+  year: 2026
+  notes: "Preprint. School of AI and Data Science, IIT Jodhpur."
