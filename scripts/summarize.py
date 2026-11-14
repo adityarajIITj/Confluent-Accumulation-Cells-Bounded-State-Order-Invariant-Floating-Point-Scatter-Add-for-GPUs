@@ -54,7 +54,7 @@ def pct(a, b):
 def save(fig, name):
     fig.tight_layout()
     fig.savefig(os.path.join(FIG, name + ".png"))
-    fig.savefig(os.path.join(FIG, name + ".pdf"))
+    fig.savefig(os.path.join(FIG, name + ".pdf"), metadata={"CreationDate": None, "ModDate": None})
     plt.close(fig)
 
 
