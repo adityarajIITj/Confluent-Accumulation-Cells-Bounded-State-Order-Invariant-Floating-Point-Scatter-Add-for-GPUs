@@ -1,9 +1,12 @@
 \documentclass[journal]{IEEEtran}
-\usepackage{fontspec}
-\usepackage{unicode-math}
-\setmainfont{TeX Gyre Termes}
-\setmathfont{Latin Modern Math}
-\setmonofont{Latin Modern Mono}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage{amsmath,amssymb}
+\DeclareUnicodeCharacter{2212}{\ensuremath{-}}
+\DeclareUnicodeCharacter{00D7}{\ensuremath{\times}}
+\DeclareUnicodeCharacter{00B1}{\ensuremath{\pm}}
+\DeclareUnicodeCharacter{2019}{'}
 \usepackage{graphicx}
 \usepackage{booktabs,tabularx,array}
 \usepackage{enumitem}
@@ -14,10 +17,11 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{caption}
 \captionsetup{font=small,labelfont=bf,labelsep=period}
-\providecommand{\mdlgwhtsquare}{$\square$}
+\providecommand{\mdlgwhtsquare}{\ensuremath{\square}}
 \providecommand{\tightlist}{\setlength{\itemsep}{2pt}\setlength{\parskip}{0pt}}
 \renewcommand{\arraystretch}{1.15}
 \begin{document}
+
 \title{Confluent Accumulation Cells: Bounded-State, Order-Invariant Floating-Point Scatter-Add}
 \author{\IEEEauthorblockN{Aditya Raj\thanks{Research status: the evidence in this paper comes from a software reference model of a GPU and from CPU threads. Validation on physical GPUs remains future work.}}
 \IEEEauthorblockA{School of Artificial Intelligence and Data Science\\Indian Institute of Technology Jodhpur, Jodhpur, India}}
