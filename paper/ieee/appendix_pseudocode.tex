@@ -1,0 +1,89 @@
+\documentclass[journal]{IEEEtran}
+\usepackage{fontspec}
+\usepackage{unicode-math}
+\setmainfont{TeX Gyre Termes}
+\setmathfont{Latin Modern Math}
+\setmonofont{Latin Modern Mono}
+\usepackage{graphicx}
+\usepackage{booktabs,tabularx,array}
+\usepackage{enumitem}
+\setlist{itemsep=2pt,topsep=4pt,parsep=0pt}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily\small,columns=fullflexible,keepspaces=true,mathescape=true,breaklines=true,frame=lines,framesep=4pt,aboveskip=8pt,belowskip=8pt}
+\usepackage[hyphens]{url}
+\usepackage[hidelinks]{hyperref}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf,labelsep=period}
+\providecommand{\mdlgwhtsquare}{$\square$}
+\providecommand{\tightlist}{\setlength{\itemsep}{2pt}\setlength{\parskip}{0pt}}
+\renewcommand{\arraystretch}{1.15}
+\begin{document}
+\title{Supplementary Appendix: Pseudocode for Confluent Accumulation Cells}
+\author{\IEEEauthorblockN{Aditya Raj}
+\IEEEauthorblockA{School of Artificial Intelligence and Data Science\\Indian Institute of Technology Jodhpur, Jodhpur, India}}
+\maketitle
+\appendix
+
+\hypertarget{pseudocode}{%
+\section{Pseudocode}\label{pseudocode}}
+
+The four operations of CAC, in the compare-and-swap form. tag and val
+unpack a cell; pack builds one.
+
+\begin{lstlisting}
+deposit(dst, x):
+  (class, neg, m, q) = decode(x)
+  # finite x = $\pm m\cdot 2^q$ grid units
+  if class == zero:
+    update(dst, 0, 1, neg ? $2^{28}$ : 1); return
+  if class == inf:
+    update(dst, NB mod K, NB+2, neg ? $2^{28}$ : 1); return
+  if class == nan:
+    update(dst, (NB+1) mod K, NB+3, 1); return
+  for each non-zero base-$2^W$ digit g
+      of $m\cdot 2^q$, in bin j:
+    update(dst, j mod K, j+2, neg ? -g : g)
+
+update(dst, slot, t, v):
+  old = load(cell[dst][slot])
+  loop:
+    if tag(old) > t: return   # Lemma 2
+    new = (tag(old) == t) ? pack(t, val(old)+v)
+                          : pack(t, v)
+    seen = compare_and_swap(cell[dst][slot], old, new)
+    if seen == old: return
+    old = seen
+
+readout(dst):
+  S = 0
+  for each slot whose tag t is a finite bin tag:
+    S += val(cell) $\cdot\, 2^{(t-2)W}$  # exact
+  if NaN seen, or both +Inf and -Inf: return NaN
+  if an infinity was seen: return it
+  if S == 0: return (only -0 deposited) ? -0 : +0
+  return round_to_nearest_even(S)
+
+merge(A, B):   # multi-device
+  for every cell c: A[c] = A[c] $\oplus$ B[c]
+\end{lstlisting}
+
+\hypertarget{artifact-contents}{%
+\section{Artifact contents}\label{artifact-contents}}
+
+\begin{table}[!htbp]\centering\small\setlength{\tabcolsep}{4pt}
+\caption{Contents of the artifact.}\label{tab:24}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash\hsize=1.000\hsize}X>{\raggedright\arraybackslash\hsize=1.000\hsize}X}
+\toprule
+Path & Content \\
+\midrule
+include/cac/common.h, fp32.h, bigint.h, exact.h & Random generator, IEEE decoding, big integers, rounding and the oracle \\
+include/cac/accum.h & CAC and all baselines \\
+include/cac/vgpu.h, runner.h, workload.h & Virtual GPU, schedulers, sharding, workloads \\
+include/cac/train.h, threads.h & Training experiment and the real-thread backend \\
+src/tests.cpp, src/experiments.cpp, src/main.cpp & 55 tests, experiments E1 to E8, command line \\
+scripts/crosscheck.py, scripts/summarize.py & Independent re-derivation; tables and figures \\
+results/ & Raw CSV files, tables.md, figures \\
+\bottomrule
+\end{tabularx}
+\end{table}
+\end{document}
